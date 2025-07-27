@@ -1,58 +1,42 @@
 import { Router } from 'express';
-import { 
-  getUser, 
-  getAllUsers, 
-  createUser, 
-  updateUser, 
-  deleteUser,
-  getAllProducts,
-  getProductById,
-  createProduct,
-  getDashboardStats
-} from '../controllers/controller';
+import authRoutes from './auth';
 
 const router = Router();
 
-// Health check route
-router.get('/', (req, res) => {
-  res.status(200).json({
+// API routes
+router.use('/auth', authRoutes);
+
+// Health check
+router.get('/health', (req, res) => {
+  res.json({
     success: true,
-    message: 'Business Inventory API is running successfully! 🚀',
+    message: 'API is healthy',
     timestamp: new Date().toISOString(),
-    version: '1.0.0',
-    endpoints: {
-      users: [
-        'GET /api/users - Get all users',
-        'GET /api/user/:id - Get user by ID',
-        'POST /api/user - Create new user',
-        'PUT /api/user/:id - Update user',
-        'DELETE /api/user/:id - Delete user'
-      ],
-      products: [
-        'GET /api/products - Get all products',
-        'GET /api/product/:id - Get product by ID',
-        'POST /api/product - Create new product'
-      ],
-      dashboard: [
-        'GET /api/dashboard/stats - Get dashboard statistics'
-      ]
-    }
+    environment: process.env.NODE_ENV || 'development'
   });
 });
 
-// User routes
-router.get('/user/:id', getUser);
-router.get('/users', getAllUsers);
-router.post('/user', createUser);
-router.put('/user/:id', updateUser);
-router.delete('/user/:id', deleteUser);
-
-// Product routes
-router.get('/products', getAllProducts);
-router.get('/product/:id', getProductById);
-router.post('/product', createProduct);
-
-// Dashboard routes
-router.get('/dashboard/stats', getDashboardStats);
+// API documentation
+router.get('/', (req, res) => {
+  res.json({
+    success: true,
+    message: 'Business Inventory API',
+    version: '1.0.0',
+    endpoints: {
+      auth: {
+        register: 'POST /api/auth/register',
+        login: 'POST /api/auth/login',
+        profile: 'GET /api/auth/profile',
+        verifyToken: 'POST /api/auth/verify-token',
+        confirmEmail: 'POST /api/auth/confirm-email',
+        forgotPassword: 'POST /api/auth/forgot-password',
+        resetPassword: 'POST /api/auth/reset-password',
+        resendConfirmation: 'POST /api/auth/resend-confirmation',
+        logout: 'POST /api/auth/logout',
+        test: 'GET /api/auth/test'
+      }
+    }
+  });
+});
 
 export default router;
